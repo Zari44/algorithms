@@ -30,15 +30,14 @@ bool Graph::readFromFile(const char *file_path)
         while (getline(graph_file, line))
         {
             vector<int> temp;
-            stringstream ss;
-            string vertex_s;
             int vertex_i;
-            ss << line;
-            while (!ss.eof())
+            int pos;
+            string delimiter = " ";
+            while ((pos = line.find(delimiter)) != std::string::npos)
             {
-                ss >> vertex_s;
-                if (stringstream(vertex_s) >> vertex_i)
-                    temp.push_back(vertex_i);
+                vertex_i = atoi(line.substr(0, pos).c_str());
+                temp.push_back(vertex_i);
+                line.erase(0, pos + delimiter.length());
             }
             adj.push_back(temp);
         }
