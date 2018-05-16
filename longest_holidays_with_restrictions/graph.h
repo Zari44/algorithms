@@ -5,21 +5,21 @@
 
 class Graph
 {
+    int _number_of_vertices;
+    void addEdge(int u, int v, int destination_value);
+public:
     struct Vertex{
-        Vertex(int value, int number, std::vector<Vertex>* adj)
-            : value(value), number(number), adj(adj) {}
+        Vertex(int value = 0, int number = 0) : value(value), number(number) {}
         int value;
         int number;
-        std::vector<Vertex>* adj;
     };
-    void addEdge(int u, int v);
-public:
     Graph();
     Graph(const Graph& graph);
     ~Graph();
-    std::vector<Vertex>* adj;
+    std::vector<std::vector<Vertex>>* adj;
     bool readFromFile(const char* file_path);
     void print();
+    int getNumberOfVertices() { return _number_of_vertices; }
 };
 
 #endif // GRAPH_H
