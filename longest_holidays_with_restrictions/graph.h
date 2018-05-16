@@ -10,6 +10,7 @@ class Graph
 public:
     struct Vertex{
         Vertex(int value = 0, int number = 0) : value(value), number(number) {}
+        Vertex(const Vertex& vertex) { value = vertex.value; number = vertex.number; }
         int value;
         int number;
     };
