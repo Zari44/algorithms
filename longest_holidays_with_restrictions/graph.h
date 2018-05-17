@@ -16,6 +16,7 @@ public:
     };
     Graph();
     Graph(const Graph& graph);
+    Graph(int edges[][] , int node_values[]);
     ~Graph();
     std::vector<std::vector<Vertex>>* adj;
     bool readFromFile(const char* file_path);

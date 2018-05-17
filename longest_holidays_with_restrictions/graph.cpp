@@ -12,6 +12,8 @@ Graph::Graph() : _number_of_vertices(0)
 
 }
 
+
+
 void Graph::addEdge(int u, int v, int destination_value)
 {
 //    Vertex vertex(u,v,adj->at(u));
@@ -76,6 +78,11 @@ Graph::Graph(const Graph& graph)
         }
         adj->push_back(temp_list);
     }
+}
+
+Graph::Graph(int edges[][], int node_values[])
+{
+
 }
 
 Graph::~Graph()
