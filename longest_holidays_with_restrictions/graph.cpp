@@ -12,8 +12,6 @@ Graph::Graph() : _number_of_vertices(0)
 
 }
 
-
-
 void Graph::addEdge(int u, int v, int destination_value)
 {
 //    Vertex vertex(u,v,adj->at(u));
