@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
-#include <queue>
+#include <list>
+#include <algorithm>
 
 using namespace std;
 
@@ -8,9 +9,8 @@ class Graph
 {
     int no_nodes;
 public:
-    struct Edge;
     Graph(const int no_nodes, const int nodes_values[]);
-    vector<vector<Edge> > *adj;
+    vector<vector<int> > *adj;
     vector<int> *adj_val;
     void addEdge(int node1, int node2);
     void print() const;
@@ -18,18 +18,10 @@ public:
     int getNodeValue(int node) const { return adj_val->at(node); }
 };
 
-struct Graph::Edge
-{
-    Edge(int head_node, bool visited = false)
-        : head_node(head_node), visited(visited) {}
-    int head_node;
-    bool visited;
-};
-
 Graph::Graph(const int no_nodes, const int nodes_values[])
     : no_nodes(no_nodes)
 {
-    adj = new vector<vector<Edge> >(no_nodes);
+    adj = new vector<vector<int> >(no_nodes);
     adj_val = new vector<int>(no_nodes);
     for (int i = 0; i < no_nodes; ++i)
         adj_val->at(i) = nodes_values[i];
@@ -42,45 +34,34 @@ void Graph::addEdge(int node1, int node2)
 
 void Graph::print() const
 {
-    for (vector<vector<Edge> >::iterator adj_list = adj->begin(); adj_list != adj->end(); ++adj_list)
+    for (vector<vector<int> >::iterator adj_list = adj->begin(); adj_list != adj->end(); ++adj_list)
     {
-        for (vector<Edge>::iterator edge = adj_list->begin(); edge != adj_list->end(); ++edge)
-            cout << edge->head_node << " ";
+        for (vector<int>::iterator edge = adj_list->begin(); edge != adj_list->end(); ++edge)
+            cout << *edge << " ";
         cout << endl;
     }
 }
 
-
-bool has_all_edges_from_node_been_visited(const Graph& graph, int node)
+void find_optimal_offices_utils(Graph& graph, list<int>& que, int start_node, int previous_node[], bool visited_nodes[], int days_off[])
 {
-    vector<Graph::Edge> edges = graph.adj->at(node);
-    for (const auto& edge : edges)
-        if (!edge.visited)
-            return false;
-    return true;
-}
-
-void find_optimal_offices_utils(Graph& graph, queue<Graph::Edge>& que, int start_node, int previous_node[], bool visited_edges[], int days_off[])
-{
-    vector<Graph::Edge>::iterator edge;
+    vector<int>::iterator edge;
     while (!que.empty())
     {
-        start_node = que.front().head_node;
-        que.pop();
+        que.sort();
+        start_node = que.front();
+        que.pop_front();
         for ( edge = (graph.adj->at(start_node)).begin(); edge != (graph.adj->at(start_node)).end(); ++edge)
         {
-            if (visited_edges[edge->head_node] == false)
+            if (visited_nodes[*edge] == false)
             {
-                que.push(*edge);
-                if (has_all_edges_from_node_been_visited(graph, edge->head_node))
-                    visited_edges[edge->head_node] = true;
-                int day_off = days_off[start_node] + graph.adj_val->at(edge->head_node);
-                if (days_off[edge->head_node] < day_off)
+                que.push_back(*edge);
+                int day_off = days_off[start_node] + graph.adj_val->at(*edge);
+                if (days_off[*edge] < day_off)
                 {
-                    days_off[edge->head_node] = day_off;
-                    previous_node[edge->head_node] = start_node;
+                    days_off[*edge] = day_off;
+                    previous_node[*edge] = start_node;
                 }
-                cout << "Current node: " << edge->head_node << " \t";
+                cout << "Current node: " << *edge << " \t";
                 cout << "Previous node : " << start_node <<  " \t";
                 cout << "Days off previous node: " << days_off[start_node] << " \t";
                 cout << "Days off: " << day_off << endl;
@@ -91,11 +72,9 @@ void find_optimal_offices_utils(Graph& graph, queue<Graph::Edge>& que, int start
 
 int find_optimal_offices(Graph& graph, int previous_node[], int start_node, int& best_last_office)
 {
-    queue<Graph::Edge> que;
+    list<int> que;
     bool visited[graph.getNoNodes()];
     int days_off[graph.getNoNodes()];
-
-    int start_edge = 0;
 
     for (int i = 0; i < graph.getNoNodes(); ++i)
     {
@@ -103,10 +82,8 @@ int find_optimal_offices(Graph& graph, int previous_node[], int start_node, int&
         days_off[i] = 0;
     }
 
-    que.push(start_node);
-    graph.adj->at(start_node).at(start_edge).visited = true;
-    if (has_all_edges_from_node_been_visited(graph, start_node))
-        visited[start_node] = true;
+    que.push_back(start_node);
+    visited[start_node] = true;
     days_off[start_node] = graph.getNodeValue(start_node);
     find_optimal_offices_utils(graph, que, start_node, previous_node, visited, days_off);
 
@@ -135,10 +112,11 @@ void print_best_offices(int previous[], int best_last_office, int starting_offic
 
 }
 
-int main(int argc, char *argv[])
+int main()
 {
     const int number_of_nodes = 18;
-    const int nodes_values[number_of_nodes] = {0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1};
+    const int nodes_values[number_of_nodes] = {0,2,1,1,1,2,0,0,0,0,0,0,0,0,5,0,0,3};
+
     Graph graph(number_of_nodes, nodes_values);
 
     graph.addEdge(0,1);
